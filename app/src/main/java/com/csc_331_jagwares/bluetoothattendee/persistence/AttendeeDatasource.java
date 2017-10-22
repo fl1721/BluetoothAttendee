@@ -4,6 +4,7 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.icu.text.SimpleDateFormat;
 
 import com.csc_331_jagwares.bluetoothattendee.persistence.model.Class;
 
@@ -48,11 +49,19 @@ public class AttendeeDatasource {
             + "lastName TEXT, \n"
             + "emailAddress TEXT, \n"
             + "macAddress TEXT \n"
-            + ");"
+            + ")"
         );
         db.execSQL("CREATE TABLE tblEnrollment ( \n"
             + "jagNumber TEXT REFERENCES tblStudent(jagNumber), \n"
-            + "className TEXT REFERENCES tblClass(className))"
+            + "className TEXT REFERENCES tblClass(className), \n"
+            + "PRIMARY KEY (jagNumber, className) \n"
+            + ")"
+        );
+        db.execSQL("CREATE TABLE tblAttendance ( \n"
+            + "className TEXT REFERENCES tblClass(className), \n"
+            + "date TEXT NOT NULL, \n"
+            + "PRIMARY KEY (className, date) \n"
+            + ")"
         );
     }
 
@@ -113,6 +122,11 @@ public class AttendeeDatasource {
         } finally {
             db.endTransaction();
         }
+    }
+
+    public void insertClassSession(Class cls, SimpleDateFormat date) {
+
+        //db.insertWithOnConflict()
     }
 
     /**
