@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Vector;
 
 /**
+ *
  * Created by steven on 10/3/2017.
  */
 public class Class extends Model {
@@ -18,6 +19,8 @@ public class Class extends Model {
     private String className;
 
     /**
+     * className is read-only.
+     *
      * @param datasource
      * @param className
      */
@@ -35,10 +38,6 @@ public class Class extends Model {
     public String getClassName() {
         return className;
     }
-
-//    public void setClassName(String className) {
-//        // TODO: This must be dynamic.
-//    }
 
     public ArrayList<Student> getStudents() {
         return datasource.getStudentsInClass(className);

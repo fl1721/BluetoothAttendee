@@ -33,8 +33,8 @@ public class AttendeeDatasource {
     }
 
     /**
-     * Drop any existing tables and recreate them. Must be called when
-     * opening the database for the first time.
+     * Create tables. Must be called when opening the database for
+     * the first time.
      *
      * @throws SQLException
      */
@@ -63,6 +63,7 @@ public class AttendeeDatasource {
         db.close();
     }
 
+    // ====================
     // Begin write methods.
     // ====================
 
@@ -78,9 +79,6 @@ public class AttendeeDatasource {
             db.insertWithOnConflict("tblClass", null,
                     cls.toContentValues(),
                     SQLiteDatabase.CONFLICT_REPLACE);
-//            db.execSQL("INSERT INTO tblClass(className) VALUES (?)",
-//                    new String[]{className}
-//            );
             db.setTransactionSuccessful();
         } finally {
             db.endTransaction();
@@ -93,22 +91,12 @@ public class AttendeeDatasource {
      * @param student
      * @return void
      */
-//    public void insertStudent(String jagNumber, String firstName, String lastName,
-//                              String emailAddress, String macAddress) {
     public void insertStudent(Student student) {
         db.beginTransaction();
         try {
             db.insertWithOnConflict("tblStudent", null,
                     student.toContentValues(),
                     SQLiteDatabase.CONFLICT_REPLACE);
-//            db.execSQL(
-//                    "INSERT INTO tblStudent ( \n"
-//                            + STUDENT_COLUMNS_STRING
-//                            + ") \n"
-//                            + "VALUES (?, ?, ?, ?, ?)",
-//                    new String[]{jagNumber, firstName, lastName,
-//                    emailAddress, macAddress}
-//            );
             db.setTransactionSuccessful();
         } finally {
             db.endTransaction();
@@ -137,7 +125,9 @@ public class AttendeeDatasource {
 
     // =================
     // End write methods
+    // =================
 
+    // ==================
     // Begin read methods
     // ==================
 
@@ -167,7 +157,7 @@ public class AttendeeDatasource {
         return results;
     }
 
-    // Short for c.getString(c.getColumnIndex(colName));
+    // Get value of field from cursor.
     private String __(Cursor c, String fieldName) {
         return c.getString(c.getColumnIndex(fieldName));
     }
@@ -178,9 +168,8 @@ public class AttendeeDatasource {
      * @param jagNumber
      * @return
      */
-    /// TODO: use explicit field selection.
     public Student getStudentByJagNumber(String jagNumber) {
-        Cursor c = db.rawQuery("SELECT " + STUDENT_COLUMNS_STRING + " FROM tblStudent WHERE jagNumber = ?",
+        Cursor c = db.rawQuery("SELECT * FROM tblStudent WHERE jagNumber = ?",
                 new String[]{jagNumber});
         if (c.moveToNext()) {
             return new Student(this,

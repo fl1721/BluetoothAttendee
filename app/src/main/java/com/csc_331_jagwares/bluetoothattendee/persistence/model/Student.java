@@ -58,6 +58,22 @@ public class Student extends Model {
         return row;
     }
 
+    /**
+     * Enroll student in a given class.
+     *
+     * @param cls
+     */
+    public void enroll(Class cls) {
+        datasource.enrollStudent(this, cls);
+    }
+    /**
+     * Save new objects, or save changes made by setter methods.
+     * Not needed after calling Student.enroll(Class).
+     */
+    public void save() {
+        datasource.insertStudent(this);
+    }
+
     public String getJagNumber() {
         return jagNumber;
     }
@@ -92,16 +108,5 @@ public class Student extends Model {
 
     public void setMacAddress(String macAddress) {
         this.macAddress = macAddress;
-    }
-
-    public void enroll(Class cls) {
-        datasource.enrollStudent(this, cls);
-    }
-    /**
-     * Save new objects, or save changes made by setter methods.
-     * Not needed after calling Student.enroll(Class).
-     */
-    public void save() {
-        datasource.insertStudent(this);
     }
 }
