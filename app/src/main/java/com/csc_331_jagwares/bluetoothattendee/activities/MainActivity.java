@@ -3,6 +3,7 @@ package com.csc_331_jagwares.bluetoothattendee.activities;
 import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.database.SQLException;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
@@ -57,7 +58,14 @@ public class MainActivity extends AppCompatActivity
         // Setup datasource.
         // TODO: Initialize database if it doesn't exist.
         datasource = AttendeeDatasource.getInstance(this);
-        datasource.open();
+        try {
+            datasource.open();
+            datasource.initializeDatabase();
+        }
+        catch (SQLException e) {
+            datasource.open();
+        }
+
         //datasource.initializeDatabase();
 
         // Create classes.
@@ -74,13 +82,13 @@ public class MainActivity extends AppCompatActivity
         // Create students.
         Student jimmy = new Student(datasource,
                 "J99999999", "Jimmy", "James",
-                "jimmyjames@foo.bar", "00-14-22-01-23-45"
+                "jimmyjames@foo.bar", null
         );
-        jimmy.save();
+        if(!datasource.studentExists(jimmy.getJagNumber())) { jimmy.save();}
         Student willy = new Student(datasource,
                 "J88888888", "Willy", "Wonka",
-                "willywonka@foo.bar", "00-14-22-01-23-46");
-        willy.save();
+                "willywonka@foo.bar", null);
+        if(!datasource.studentExists(willy.getJagNumber())) { willy.save();}
         // Hobbits don't go to school.
         Student frodo = new Student(datasource,
                 "JOOGGGGGG", "Frodo", "Baggins",
@@ -90,8 +98,8 @@ public class MainActivity extends AppCompatActivity
         // Class.addStudent() and Student.enroll() are different
         // ways of doing the same thing.
         // You don't have to call save() after these.
-        ubw.addStudent(jimmy);
-        willy.enroll(ubw);
+        if (!datasource.studentInClass(jimmy.getJagNumber(), ubw.getClassName())) { ubw.addStudent(jimmy);}
+        if (!datasource.studentInClass(willy.getJagNumber(), ubw.getClassName())) { willy.enroll(ubw);};
 
         // Request permissions required for the app.
         if (ContextCompat.checkSelfPermission(this,
