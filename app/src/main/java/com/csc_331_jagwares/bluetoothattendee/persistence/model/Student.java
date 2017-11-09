@@ -48,6 +48,15 @@ public class Student extends Model {
         this.macAddress = macAddress;
     }
 
+    public Student (AttendeeDatasource datasource, String jagNumber, String firstName, String lastName) {
+        super(datasource);
+        this.jagNumber = jagNumber;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.emailAddress = null;
+        this.macAddress = null;
+    }
+
     public ContentValues toContentValues() {
         ContentValues row = new ContentValues();
         row.put("jagNumber", jagNumber);

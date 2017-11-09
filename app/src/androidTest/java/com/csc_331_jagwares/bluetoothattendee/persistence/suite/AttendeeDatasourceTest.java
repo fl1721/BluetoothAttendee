@@ -62,8 +62,7 @@ public class AttendeeDatasourceTest {
         willy.save();
         // Hobbits don't go to school.
         Student frodo = new Student(datasource,
-                "JOOGGGGGG", "Frodo", "Baggins",
-                null, null);
+                "JOOGGGGGG", "Frodo", "Baggins");
         frodo.save();
 
         // Class.addStudent() and Student.enroll() are different
