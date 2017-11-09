@@ -38,6 +38,7 @@ public class Student extends Model {
      * @param emailAddress
      * @param macAddress
      */
+
     public Student (AttendeeDatasource datasource, String jagNumber, String firstName, String lastName,
                     String emailAddress, String macAddress) {
         super(datasource);
@@ -46,6 +47,16 @@ public class Student extends Model {
         this.lastName = lastName;
         this.emailAddress = emailAddress;
         this.macAddress = macAddress;
+    }
+
+    public Student (AttendeeDatasource datasource, String jagNumber, String firstName, String lastName) {
+        super(datasource);
+        this.datasource = datasource;
+        this.jagNumber = jagNumber;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.emailAddress = null;
+        this.macAddress = null;
     }
 
     public ContentValues toContentValues() {
