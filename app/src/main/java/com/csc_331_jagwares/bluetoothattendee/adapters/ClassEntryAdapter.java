@@ -9,7 +9,7 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import com.csc_331_jagwares.bluetoothattendee.R;
-import com.csc_331_jagwares.bluetoothattendee.models.Class;
+import com.csc_331_jagwares.bluetoothattendee.persistence.model.Class;
 
 import java.util.ArrayList;
 
@@ -37,7 +37,7 @@ public class ClassEntryAdapter extends ArrayAdapter {
         TextView tvClassName = view.findViewById(R.id.tvClassName);
 
         if (classEntry != null) {
-            tvClassName.setText(classEntry.getNumber() + "-" + classEntry.getSection() + " " + classEntry.getTitle());
+            tvClassName.setText(classEntry.getClassName()/* + "-" + classEntry.getSection() + " " + classEntry.getTitle()*/);
         }
 
         return view;

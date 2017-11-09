@@ -1,9 +1,9 @@
 package com.csc_331_jagwares.bluetoothattendee.activities;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
@@ -24,21 +24,22 @@ import com.csc_331_jagwares.bluetoothattendee.fragments.ClassesFragment;
 import com.csc_331_jagwares.bluetoothattendee.fragments.HelpFragment;
 import com.csc_331_jagwares.bluetoothattendee.fragments.ReportsFragment;
 import com.csc_331_jagwares.bluetoothattendee.fragments.SettingsFragment;
-import com.csc_331_jagwares.bluetoothattendee.models.Class;
-import com.csc_331_jagwares.bluetoothattendee.models.Instructor;
-import com.csc_331_jagwares.bluetoothattendee.models.Student;
+import com.csc_331_jagwares.bluetoothattendee.persistence.AttendeeDatasource;
+import com.csc_331_jagwares.bluetoothattendee.persistence.model.Class;
+import com.csc_331_jagwares.bluetoothattendee.persistence.model.Student;
 
-import java.util.ArrayList;
+import java.io.File;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    private Instructor instructor;
+    private AttendeeDatasource datasource;
     private static final int MY_PERMISSIONS_ACCESS_COARSE_LOCATION = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         // Setup the layout of the activity.
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -53,6 +54,45 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+        // Setup datasource.
+        // TODO: Initialize database if it doesn't exist.
+        datasource = AttendeeDatasource.getInstance(this);
+        datasource.open();
+        //datasource.initializeDatabase();
+
+        // Create classes.
+        Class ubw = new Class(datasource, "Underwater Basket Weaving");
+        ubw.save();
+        Class calculus = new Class(datasource, "Calculus");
+        calculus.save();
+        Class pigonometry = new Class(datasource, "Pigonometry");
+        pigonometry.save();
+        // Calling save more than once is wasteful, but has no
+        // visible effect.
+        pigonometry.save();
+
+        // Create students.
+        Student jimmy = new Student(datasource,
+                "J99999999", "Jimmy", "James",
+                "jimmyjames@foo.bar", "00-14-22-01-23-45"
+        );
+        jimmy.save();
+        Student willy = new Student(datasource,
+                "J88888888", "Willy", "Wonka",
+                "willywonka@foo.bar", "00-14-22-01-23-46");
+        willy.save();
+        // Hobbits don't go to school.
+        Student frodo = new Student(datasource,
+                "JOOGGGGGG", "Frodo", "Baggins",
+                null, null);
+        frodo.save();
+
+        // Class.addStudent() and Student.enroll() are different
+        // ways of doing the same thing.
+        // You don't have to call save() after these.
+        ubw.addStudent(jimmy);
+        willy.enroll(ubw);
+
         // Request permissions required for the app.
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.ACCESS_COARSE_LOCATION)
@@ -63,45 +103,12 @@ public class MainActivity extends AppCompatActivity
                     MY_PERMISSIONS_ACCESS_COARSE_LOCATION);
         }
 
-        // Initialize instructor object.
-        // This would be retrieved from the database.
-        instructor = new Instructor("Dr.", "Ryan", "Benton", "rbenton@southalabama.edu");
-        // Add sample classes.
-        Class class1 = new Class("CSC 331", "102", "Software Engineering Principles", "36561", "MWF" , "3:00PM-4:45PM", "Fall 2016", "SHEC 2222");
-        Class class2 = new Class("CSC 320", "101", "Computer Organization and Architecture", "5422", "MWF" , "4:00PM-4:50PM", "Fall 2016", "SHEC 2122");
-        Class class3 = new Class("CSC 311", "103", "Networks and Communication", "32654", "MWF" , "12:00PM-12:50PM", "Fall 2016", "SHEC 2232");
-        Class class4 = new Class("CSC 120", "101", "Intro to Programming", "84522", "TR" , "3:00PM-4:45PM", "Fall 2016", "SHEC 3222");
-        Class class5 = new Class("CSC 108", "102", "Intro to Computer Science", "3236", "TR" , "3:00PM-4:45PM", "Fall 2016", "SHEC 2222");
-        Student student1 = new Student("J00589451", "Alex", "Dudenhoeffer", "aad1621@jagmail.southalabama.edu");
-        Student student2 = new Student("J00345451", "Steven", "Mauseth", "swm1621@jagmail.southalabama.edu");
-        Student student3 = new Student("J00589424", "Kaitlyn", "Gaiger", "kdg1621@jagmail.southalabama.edu");
-        Student student4 = new Student("J00543451", "Fernando", "Lorenzo", "fl1621@jagmail.southalabama.edu");
-        Student student5 = new Student("J00436788", "Robert", "Cox", "aad1621@jagmail.southalabama.edu");
-        class1.addStudent(student1);
-        class1.addStudent(student3);
-        class1.addStudent(student5);
-        class2.addStudent(student1);
-        class2.addStudent(student2);
-        class2.addStudent(student3);
-        class2.addStudent(student4);
-        class2.addStudent(student5);
-        class3.addStudent(student2);
-        class3.addStudent(student3);
-        class4.addStudent(student4);
-        class5.addStudent(student5);
-        class5.addStudent(student1);
-        instructor.addClass(class1);
-        instructor.addClass(class2);
-        instructor.addClass(class3);
-        instructor.addClass(class4);
-        instructor.addClass(class5);
-
         // Update navigation drawer profile TextViews.
         View header = navigationView.getHeaderView(0);
         TextView tvHeaderName = header.findViewById(R.id.tvInstructorName);
         TextView tvHeaderEmail = header.findViewById(R.id.tvInstructorEmail);
-        tvHeaderName.setText(instructor.getFullName());
-        tvHeaderEmail.setText(instructor.getEmailAddress());
+        tvHeaderName.setText("Ryan Benton");
+        tvHeaderEmail.setText("rbenton@southalabama.edu");
 
         // Checks first item in the navigation drawer initially.
         navigationView.setCheckedItem(R.id.nav_classes);
@@ -140,7 +147,8 @@ public class MainActivity extends AppCompatActivity
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
-    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+    public boolean onNavigationItemSelected(MenuItem item) {
+
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
@@ -168,9 +176,27 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
-    public ArrayList<Class> getClasses() {
-        // This method is used to send an ArrayList of classes to the fragments.
-        return instructor.getClasses();
+    @Override
+    protected void onResume() {
+        //datasource.open();
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        //datasource.close();
+        super.onPause();
+    }
+
+    @Override
+    protected void onDestroy() {
+        //datasource.close();
+        super.onDestroy();
+    }
+
+    public AttendeeDatasource getDatasource() {
+        // This method is used to send a datasource object to a fragment.
+        return datasource;
     }
 
 }

@@ -12,7 +12,7 @@ import android.widget.TextView;
 
 import com.csc_331_jagwares.bluetoothattendee.R;
 import com.csc_331_jagwares.bluetoothattendee.activities.ClassActivity;
-import com.csc_331_jagwares.bluetoothattendee.models.Class;
+import com.csc_331_jagwares.bluetoothattendee.persistence.model.Class;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -37,10 +37,11 @@ public class ClassFragment extends Fragment implements View.OnClickListener {
         classEntry = ((ClassActivity) getActivity()).getClassEntry();
 
         // Set the main activity title.
-        getActivity().setTitle(classEntry.getNumber() + "-" + classEntry.getSection());
+        getActivity().setTitle(classEntry.getClassName()  /*classEntry.getNumber() + "-" + classEntry.getSection()*/);
 
         // Populate class details table with class attributes.
         TextView tvClassName = view.findViewById(R.id.tvClassName);
+        /*
         TextView tvClassTitle = view.findViewById(R.id.tvClassTitle);
         TextView tvClassCRN = view.findViewById(R.id.tvClassCRN);
         TextView tvClassDays = view.findViewById(R.id.tvClassDays);
@@ -48,15 +49,17 @@ public class ClassFragment extends Fragment implements View.OnClickListener {
         TextView tvClassLocation = view.findViewById(R.id.tvClassLocation);
         TextView tvClassSemester = view.findViewById(R.id.tvClassSemester);
         TextView tvClassNumStudents = view.findViewById(R.id.tvClassNumStudents);
+        */
         if (classEntry != null) {
-            tvClassName.setText(classEntry.getNumber() + "-" + classEntry.getSection());
-            tvClassTitle.setText (classEntry.getTitle());
+            tvClassName.setText(classEntry.getClassName()/*classEntry.getNumber() + "-" + classEntry.getSection()*/);
+         /*   tvClassTitle.setText (classEntry.getTitle());
             tvClassCRN.setText (getString(R.string.frag_crn) + classEntry.getCrn());
             tvClassDays.setText(getString(R.string.frag_days) + classEntry.getDays());
             tvClassLocation.setText(getString(R.string.frag_loc) + classEntry.getLocation());
             tvClassSemester.setText(classEntry.getSemester());
             tvClassTime.setText(classEntry.getTime());
             tvClassNumStudents.setText("Number of Students: "+ classEntry.getStudents().size());
+        */
         }
 
         // Setup action buttons.
@@ -74,6 +77,7 @@ public class ClassFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onClick(View view) {
         // Handle button clicks.
+        String className = classEntry.getClassName();
         Fragment fragment = null;
 
         switch (view.getId()) {
@@ -90,7 +94,7 @@ public class ClassFragment extends Fragment implements View.OnClickListener {
 
         // Switch to the selected fragment.
         Bundle bundle = new Bundle();
-        bundle.putParcelable("classEntry", classEntry);
+        bundle.putString("className", className);
 
         if (fragment != null) {
             fragment.setArguments(bundle);

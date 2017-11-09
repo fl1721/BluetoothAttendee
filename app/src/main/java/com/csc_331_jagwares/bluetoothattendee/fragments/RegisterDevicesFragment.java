@@ -7,7 +7,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -21,18 +20,23 @@ import android.widget.ListView;
 import com.csc_331_jagwares.bluetoothattendee.R;
 import com.csc_331_jagwares.bluetoothattendee.activities.ClassActivity;
 import com.csc_331_jagwares.bluetoothattendee.adapters.StudentEntryAdapter;
-import com.csc_331_jagwares.bluetoothattendee.models.Class;
-import com.csc_331_jagwares.bluetoothattendee.models.Student;
+import com.csc_331_jagwares.bluetoothattendee.persistence.AttendeeDatasource;
+import com.csc_331_jagwares.bluetoothattendee.persistence.model.Class;
+import com.csc_331_jagwares.bluetoothattendee.persistence.model.Student;
 
 import java.util.ArrayList;
+
 
 /**
  * A simple {@link Fragment} subclass.
  */
 public class RegisterDevicesFragment extends Fragment {
 
+    private AttendeeDatasource datasource;
+
     private View view;
 
+    private String className;
     private Class classEntry;
     private ArrayList<Student> students;
 
@@ -42,6 +46,7 @@ public class RegisterDevicesFragment extends Fragment {
     private ArrayList<BluetoothDevice> devices;
 
     StudentEntryAdapter adapter;
+
 
     public RegisterDevicesFragment() {
         // Required empty public constructor
@@ -56,11 +61,18 @@ public class RegisterDevicesFragment extends Fragment {
         // Inflate the layout for this fragment.
         view = inflater.inflate(R.layout.fragment_register_devices, container, false);
 
+        // Get Datasource object from the ClassActivity.
+        datasource = ((ClassActivity) getActivity()).getDatasource();
+
         // Get classEntry from ClassFragment.
         Bundle bundle = this.getArguments();
         if (bundle != null) {
-            classEntry = bundle.getParcelable("classEntry");
+            className = bundle.getString("className");
         }
+
+        // Setup Class object.
+        classEntry = datasource.getClassByName(className);
+
         // Get ArrayList of students from the class.
         students = classEntry.getStudents();
 
@@ -150,10 +162,10 @@ public class RegisterDevicesFragment extends Fragment {
                     Log.d("BT", "Added " + device.getName() + ":" + device.getAddress());
                     mBluetoothAdapter.cancelDiscovery();
                     for (Student student : students) {
-                        if (student.getId().equals(device.getName())) {
+                        if (student.getJagNumber().equals(device.getName())) {
                             student.setMacAddress(device.getAddress());
                             updateListView(student);
-                            Log.d("BT", student.getId() + " added with mac " + student.getMacAddress());
+                            Log.d("BT", student.getJagNumber() + " added with mac " + student.getMacAddress());
                         }
                     }
                     devices.add(device);
