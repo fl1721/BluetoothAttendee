@@ -73,10 +73,16 @@ public class AttendeeDatasource {
             + "PRIMARY KEY (jagNumber, className) \n"
             + ")"
         );
-        db.execSQL("CREATE TABLE tblAttendance ( \n"
+        db.execSQL("CREATE TABLE tblClassSession ( \n"
+            + "sessionID INTEGER PRIMARY KEY, \n"
             + "className TEXT REFERENCES tblClass(className), \n"
             + "date TEXT NOT NULL, \n"
-            + "PRIMARY KEY (className, date) \n"
+            + "CONSTRAINT sessUnique UNIQUE (className, date)"
+            + ")"
+        );
+        db.execSQL("CREATE TABLE tblAttendance (\n"
+            + "classSession INTEGER REFERENCES tblClassSession(sessionID), \n"
+            + "jagNumber TEXT REFERENCES tblStudent(jagNumber)"
             + ")"
         );
     }
