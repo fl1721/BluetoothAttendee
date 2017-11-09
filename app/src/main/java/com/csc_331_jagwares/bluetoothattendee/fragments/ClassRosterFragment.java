@@ -10,9 +10,12 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.csc_331_jagwares.bluetoothattendee.R;
+import com.csc_331_jagwares.bluetoothattendee.activities.ClassActivity;
 import com.csc_331_jagwares.bluetoothattendee.adapters.StudentEntryAdapter;
-import com.csc_331_jagwares.bluetoothattendee.models.Class;
-import com.csc_331_jagwares.bluetoothattendee.models.Student;
+import com.csc_331_jagwares.bluetoothattendee.persistence.AttendeeDatasource;
+import com.csc_331_jagwares.bluetoothattendee.persistence.model.Class;
+import com.csc_331_jagwares.bluetoothattendee.persistence.model.Student;
+
 
 import java.util.ArrayList;
 
@@ -21,8 +24,11 @@ import java.util.ArrayList;
  */
 public class ClassRosterFragment extends Fragment {
 
+    private AttendeeDatasource datasource;
+
     private View view;
 
+    private String className;
     private Class classEntry;
     private ArrayList<Student> students;
 
@@ -42,11 +48,18 @@ public class ClassRosterFragment extends Fragment {
         // Inflate the layout for this fragment.
         View view = inflater.inflate(R.layout.fragment_class_roster, container, false);
 
+        // Get Datasource object from the ClassActivity.
+        datasource = ((ClassActivity) getActivity()).getDatasource();
+
         // Get classEntry from ClassFragment.
         Bundle bundle = this.getArguments();
         if (bundle != null) {
-            classEntry = bundle.getParcelable("classEntry");
+            className = bundle.getString("className");
         }
+
+        // Setup Class object.
+        classEntry = datasource.getClassByName(className);
+
         // Get ArrayList of students from the class.
         students = classEntry.getStudents();
 
@@ -75,7 +88,7 @@ public class ClassRosterFragment extends Fragment {
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                // Student studentEntry = students.get(position);
+                //Student studentEntry = students.get(position);
             }
         });
     }

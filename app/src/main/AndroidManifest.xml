@@ -24,10 +24,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity
             android:name=".activities.ClassActivity"
             android:parentActivityName="com.csc_331_jagwares.bluetoothattendee.activities.MainActivity" >
         </activity>
+
     </application>
 
 </manifest>

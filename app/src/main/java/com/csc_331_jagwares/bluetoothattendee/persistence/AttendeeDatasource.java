@@ -1,6 +1,6 @@
 package com.csc_331_jagwares.bluetoothattendee.persistence;
 
-import android.content.ContentValues;
+import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
@@ -16,6 +16,7 @@ import java.util.ArrayList;
 public class AttendeeDatasource {
     private File dbPath;
     private SQLiteDatabase db;
+    private static AttendeeDatasource datasourceInstance;
 
     private String STUDENT_COLUMNS_STRING =
             "jagNumber, firstName, lastName, emailAddress, macAddress";
@@ -24,6 +25,21 @@ public class AttendeeDatasource {
 
     public AttendeeDatasource(String dbPath) {
         this.dbPath = new File(dbPath);
+    }
+
+    // Database Info
+    private static final String DATABASE_NAME = "attendeeDatabase";
+    private static final int DATABASE_VERSION = 1;
+
+    private AttendeeDatasource(Context context) {
+        this.dbPath = new File(context.getFilesDir(), "bluetoothAttendee.db");
+    }
+
+    public static synchronized AttendeeDatasource getInstance(Context context) {
+        if (datasourceInstance == null) {
+            datasourceInstance = new AttendeeDatasource(context.getApplicationContext());
+        }
+        return datasourceInstance;
     }
 
     public void open() throws SQLException {

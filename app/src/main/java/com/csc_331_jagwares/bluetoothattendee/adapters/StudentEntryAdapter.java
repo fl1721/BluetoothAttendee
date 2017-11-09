@@ -1,7 +1,6 @@
 package com.csc_331_jagwares.bluetoothattendee.adapters;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.support.annotation.NonNull;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -10,7 +9,7 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import com.csc_331_jagwares.bluetoothattendee.R;
-import com.csc_331_jagwares.bluetoothattendee.models.Student;
+import com.csc_331_jagwares.bluetoothattendee.persistence.model.Student;
 
 import java.util.ArrayList;
 
@@ -38,8 +37,8 @@ public class StudentEntryAdapter extends ArrayAdapter {
         TextView tvStudentDeviceRegistered = view.findViewById(R.id.tvStudentDeviceRegistered);
 
         if (studentEntry != null) {
-            tvStudentName.setText(studentEntry.getFullName());
-            tvStudentId.setText(studentEntry.getId());
+            tvStudentName.setText(studentEntry.getFirstName() + " " + studentEntry.getLastName());
+            tvStudentId.setText(studentEntry.getJagNumber());
             if (studentEntry.getMacAddress() != null) {
                 view.setBackgroundResource(R.color.colorRegistered);
                 tvStudentDeviceRegistered.setText("Device Registered: " + studentEntry.getMacAddress());
@@ -54,6 +53,5 @@ public class StudentEntryAdapter extends ArrayAdapter {
     public ArrayList<Student> getData() {
         return studentEntries;
     }
-
 
 }
