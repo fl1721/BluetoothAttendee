@@ -145,7 +145,8 @@ public class TakeAttendanceFragment extends Fragment {
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                // Student studentEntry = students.get(position);
+                Student studentEntry = students.get(position);
+
             }
         });
     }
