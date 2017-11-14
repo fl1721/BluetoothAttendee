@@ -1,8 +1,9 @@
 package com.csc_331_jagwares.bluetoothattendee.activities;
 
 import android.Manifest;
-import android.content.Context;
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
+import android.database.SQLException;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
@@ -12,11 +13,15 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import com.csc_331_jagwares.bluetoothattendee.R;
@@ -55,9 +60,15 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
         // Setup datasource.
-        // TODO: Initialize database if it doesn't exist.
         datasource = AttendeeDatasource.getInstance(this);
-        datasource.open();
+        try {
+            datasource.open();
+            datasource.initializeDatabase();
+        }
+        catch (SQLException e) {
+            datasource.open();
+        }
+
         //datasource.initializeDatabase();
 
         // Create classes.
@@ -74,13 +85,13 @@ public class MainActivity extends AppCompatActivity
         // Create students.
         Student jimmy = new Student(datasource,
                 "J99999999", "Jimmy", "James",
-                "jimmyjames@foo.bar", "00-14-22-01-23-45"
+                "jimmyjames@foo.bar", null
         );
-        jimmy.save();
+        if(!datasource.studentExists(jimmy.getJagNumber())) { jimmy.save();}
         Student willy = new Student(datasource,
                 "J88888888", "Willy", "Wonka",
-                "willywonka@foo.bar", "00-14-22-01-23-46");
-        willy.save();
+                "willywonka@foo.bar", null);
+        if(!datasource.studentExists(willy.getJagNumber())) { willy.save();}
         // Hobbits don't go to school.
         Student frodo = new Student(datasource,
                 "JOOGGGGGG", "Frodo", "Baggins",
@@ -90,8 +101,8 @@ public class MainActivity extends AppCompatActivity
         // Class.addStudent() and Student.enroll() are different
         // ways of doing the same thing.
         // You don't have to call save() after these.
-        ubw.addStudent(jimmy);
-        willy.enroll(ubw);
+        if (!datasource.studentInClass(jimmy.getJagNumber(), ubw.getClassName())) { ubw.addStudent(jimmy);}
+        if (!datasource.studentInClass(willy.getJagNumber(), ubw.getClassName())) { willy.enroll(ubw);};
 
         // Request permissions required for the app.
         if (ContextCompat.checkSelfPermission(this,
@@ -115,7 +126,7 @@ public class MainActivity extends AppCompatActivity
 
         // Open ClassesFragment initially.
         FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-        ft.replace(R.id.mainLayout, new ClassesFragment());
+        ft.replace(R.id.mainLayout, new ClassesFragment(), "classesFragment");
         ft.commit();
     }
 
@@ -141,8 +152,14 @@ public class MainActivity extends AppCompatActivity
         // Handle the action menu options.
         int id = item.getItemId();
 
-        return id == R.id.action_settings || super.onOptionsItemSelected(item);
+        switch (id) {
+            case R.id.action_add_class:
+                showAddClassDialog();
+                return true;
 
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 
     @SuppressWarnings("StatementWithEmptyBody")
@@ -153,21 +170,26 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         Fragment fragment = null;
+        String tag = null;
 
         if (id == R.id.nav_classes) {
             fragment = new ClassesFragment();
+            tag = "classesFragment";
         } else if (id == R.id.nav_reports){
             fragment = new ReportsFragment();
+            tag = "reportsFragment";
         } else if (id == R.id.nav_settings){
             fragment = new SettingsFragment();
+            tag = "settingsFragment";
         } else if (id == R.id.nav_help){
             fragment = new HelpFragment();
+            tag = "helpFragment";
         }
 
         // Switch to selected fragment.
         if (fragment != null) {
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
-            ft.replace(R.id.mainLayout, fragment);
+            ft.replace(R.id.mainLayout, fragment, tag);
             ft.commit();
         }
 
@@ -175,6 +197,38 @@ public class MainActivity extends AppCompatActivity
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
+
+    public void showAddClassDialog() {
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+        LayoutInflater inflater = this.getLayoutInflater();
+        final View dialogView = inflater.inflate(R.layout.dialog_add_class, null);
+        dialogBuilder.setView(dialogView);
+
+        final EditText editCourseSubject = (EditText) dialogView.findViewById(R.id.courseSubject);
+        final EditText editCourseNumber = (EditText) dialogView.findViewById(R.id.courseNumber);
+        final EditText editCourseSection = (EditText) dialogView.findViewById(R.id.courseSection);
+
+        dialogBuilder.setTitle("Add Class");
+        dialogBuilder.setMessage("Enter class info below");
+
+        dialogBuilder.setPositiveButton("Done", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                Class classEntry = new Class(datasource, editCourseSubject.getText().toString());
+                classEntry.save();
+                ((ClassesFragment) getSupportFragmentManager().findFragmentByTag("classesFragment")).updateListView(classEntry);
+            }
+        });
+
+        dialogBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int whichButton) {
+                //pass
+            }
+        });
+
+        AlertDialog b = dialogBuilder.create();
+        b.show();
+    }
+
 
     @Override
     protected void onResume() {
