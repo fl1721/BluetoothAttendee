@@ -1,0 +1,39 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+android:orientation="vertical"
+android:layout_width="wrap_content"
+android:layout_height="wrap_content">
+
+<EditText
+    android:id="@+id/courseSubject"
+    android:inputType="textCapCharacters"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="16dp"
+    android:layout_marginLeft="4dp"
+    android:layout_marginRight="4dp"
+    android:layout_marginBottom="4dp"
+    android:hint="Course Subject (CSC)" />
+
+<EditText
+    android:id="@+id/courseNumber"
+    android:inputType="number"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="16dp"
+    android:layout_marginLeft="4dp"
+    android:layout_marginRight="4dp"
+    android:layout_marginBottom="4dp"
+    android:hint="Course Number (331)" />
+
+<EditText
+    android:id="@+id/courseSection"
+    android:inputType="number"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="16dp"
+    android:layout_marginLeft="4dp"
+    android:layout_marginRight="4dp"
+    android:layout_marginBottom="4dp"
+    android:hint="Course Section (501)" />
+
+</LinearLayout>
