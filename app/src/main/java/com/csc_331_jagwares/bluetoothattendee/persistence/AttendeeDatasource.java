@@ -1,15 +1,12 @@
 package com.csc_331_jagwares.bluetoothattendee.persistence;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.icu.text.SimpleDateFormat;
 
-import com.csc_331_jagwares.bluetoothattendee.persistence.model.Class;
-
-
-import com.csc_331_jagwares.bluetoothattendee.persistence.model.Student;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -19,18 +16,11 @@ public class AttendeeDatasource {
     private SQLiteDatabase db;
     private static AttendeeDatasource datasourceInstance;
 
-    private String STUDENT_COLUMNS_STRING =
-            "jagNumber, firstName, lastName, emailAddress, macAddress";
-
-    private String CLASS_COLUMNS_STRING = "className";
-
     public AttendeeDatasource(String dbPath) {
         this.dbPath = new File(dbPath);
     }
 
-    // Database Info
     private static final String DATABASE_NAME = "attendeeDatabase";
-    private static final int DATABASE_VERSION = 1;
 
     private AttendeeDatasource(Context context) {
         this.dbPath = new File(context.getFilesDir(), "bluetoothAttendee.db");
@@ -58,33 +48,40 @@ public class AttendeeDatasource {
     public void initializeDatabase() throws SQLException {
         //db.execSQL("DELETE FROM SQLITE_MASTER");
         db.execSQL("PRAGMA foreign_keys=ON");
-        db.execSQL("CREATE TABLE tblClass (className TEXT PRIMARY KEY)");
+        db.execSQL("CREATE TABLE tblClass ( \n"
+            + "pk INTEGER PRIMARY KEY, \n"
+            + "className TEXT, \n"
+            + "CONSTRAINT classUnique UNIQUE(className)"
+            + ")"
+        );
         db.execSQL("CREATE TABLE tblStudent ( \n"
-            + "jagNumber TEXT PRIMARY KEY, "
+            + "pk INTEGER PRIMARY KEY, \n"
+            + "jagNumber TEXT, \n"
             + "firstName TEXT, \n"
             + "lastName TEXT, \n"
             + "emailAddress TEXT, \n"
-            + "macAddress TEXT \n"
+            + "macAddress TEXT, \n"
+            + "CONSTRAINT studentUnique UNIQUE (jagNumber)"
             + ")"
         );
         db.execSQL("CREATE TABLE tblEnrollment ( \n"
-            + "jagNumber TEXT REFERENCES tblStudent(jagNumber), \n"
-            + "className TEXT REFERENCES tblClass(className), \n"
-            + "PRIMARY KEY (jagNumber, className) \n"
+            + "student INTEGER REFERENCES tblStudent(pk), \n"
+            + "class INTEGER REFERENCES tblClass(pk), \n"
+            + "CONSTRAINT enrollUnique UNIQUE(student, class) \n"
             + ")"
         );
-        db.execSQL("CREATE TABLE tblClassSession ( \n"
-            + "sessionID INTEGER PRIMARY KEY, \n"
-            + "className TEXT REFERENCES tblClass(className), \n"
-            + "date TEXT NOT NULL, \n"
-            + "CONSTRAINT sessUnique UNIQUE (className, date)"
-            + ")"
-        );
-        db.execSQL("CREATE TABLE tblAttendance (\n"
-            + "classSession INTEGER REFERENCES tblClassSession(sessionID), \n"
-            + "jagNumber TEXT REFERENCES tblStudent(jagNumber)"
-            + ")"
-        );
+//        db.execSQL("CREATE TABLE tblClassSession ( \n"
+//            + "sessionID INTEGER PRIMARY KEY, \n"
+//            + "className TEXT REFERENCES tblClass(className), \n"
+//            + "date TEXT NOT NULL, \n"
+//            + "CONSTRAINT sessUnique UNIQUE (className, date)"
+//            + ")"
+//        );
+//        db.execSQL("CREATE TABLE tblAttendance (\n"
+//            + "classSession INTEGER REFERENCES tblClassSession(sessionID), \n"
+//            + "jagNumber TEXT REFERENCES tblStudent(jagNumber)"
+//            + ")"
+//        );
     }
 
     /**
@@ -105,12 +102,20 @@ public class AttendeeDatasource {
      * @return void
      */
     public void insertClass(Class cls) {
+        ContentValues row = cls.toContentValues();
+        if (cls.getPk() == 0) {
+            row.remove("pk");
+        }
         db.beginTransaction();
         try {
-            db.insertWithOnConflict("tblClass", null,
-                    cls.toContentValues(),
+            long pk = db.insertWithOnConflict("tblClass", null,
+                    row,
                     SQLiteDatabase.CONFLICT_REPLACE);
+            if (cls.getPk() == 0) {
+                cls.setPk(pk);
+            }
             db.setTransactionSuccessful();
+
         } finally {
             db.endTransaction();
         }
@@ -123,11 +128,20 @@ public class AttendeeDatasource {
      * @return void
      */
     public void insertStudent(Student student) {
+        ContentValues row = student.toContentValues();
+        if (student.getPk() == 0) {
+            row.remove("pk");
+        }
         db.beginTransaction();
         try {
-            db.insertWithOnConflict("tblStudent", null,
-                    student.toContentValues(),
+            long pk = db.insertWithOnConflict(
+                    "tblStudent",
+                    null,
+                    row,
                     SQLiteDatabase.CONFLICT_REPLACE);
+            if (student.getPk() == 0) {
+                student.setPk(pk);
+            }
             db.setTransactionSuccessful();
         } finally {
             db.endTransaction();
@@ -146,12 +160,16 @@ public class AttendeeDatasource {
      * @param cls
      */
     public void enrollStudent(Student student, Class cls) {
-//    public void enrollStudent(String jagNumber, String className) {
+        ContentValues row = new ContentValues();
+        row.put("student", student.getPk());
+        row.put("class", cls.getPk());
         db.beginTransaction();
         try {
-            db.execSQL("INSERT INTO tblEnrollment(jagNumber, className) "
-                            + "VALUES (?, ?)",
-                    new String[]{student.getJagNumber(), cls.getClassName()}
+            db.insertWithOnConflict(
+                    "tblEnrollment",
+                    null,
+                    row,
+                    SQLiteDatabase.CONFLICT_REPLACE
             );
             db.setTransactionSuccessful();
         } finally {
@@ -174,11 +192,11 @@ public class AttendeeDatasource {
      * @return Class
      */
     public Class getClassByName(String className) {
-        Cursor c = db.rawQuery("SELECT className FROM tblClass WHERE className = ?",
+        Cursor c = db.rawQuery("SELECT * FROM tblClass WHERE className = ?",
                 new String[]{className}
         );
         if (c.moveToNext()) {
-            return new Class(this, c.getString(0));
+            return Class.cursorToModel(this, c);
         } else {
             return null;
         }
@@ -188,15 +206,12 @@ public class AttendeeDatasource {
         Cursor c = db.rawQuery("SELECT * FROM tblClass;", null);
         ArrayList<Class> results = new ArrayList<Class>();
         while (c.moveToNext()) {
-            results.add(new Class(this, c.getString(0)));
+            results.add(Class.cursorToModel(this, c));
         }
         return results;
     }
 
-    // Get value of field from cursor.
-    private String __(Cursor c, String fieldName) {
-        return c.getString(c.getColumnIndex(fieldName));
-    }
+
 
     /**
      * Return student with given Jag number, else null.
@@ -208,22 +223,16 @@ public class AttendeeDatasource {
         Cursor c = db.rawQuery("SELECT * FROM tblStudent WHERE jagNumber = ?",
                 new String[]{jagNumber});
         if (c.moveToNext()) {
-            return new Student(this,
-                    __(c, "jagNumber"),
-                    __(c, "firstName"),
-                    __(c, "lastName"),
-                    __(c, "emailAddress"),
-                    __(c, "macAddress")
-            );
+            return Student.cursorToModel(this, c);
         }
         return null;
     }
 
     String STUDENTS_IN_CLASS_QUERY =
-            "SELECT s.jagNumber, s.firstName, s.lastName, s.emailAddress, s.macAddress \n"
+            "SELECT s.pk, s.jagNumber, s.firstName, s.lastName, s.emailAddress, s.macAddress \n"
             + "FROM tblClass c \n"
-            + "JOIN tblEnrollment e ON c.className = e.className \n"
-            + "JOIN tblStudent s ON e.jagNumber = s.jagNumber \n"
+            + "JOIN tblEnrollment e ON c.pk = e.class \n"
+            + "JOIN tblStudent s ON e.student = s.pk \n"
             + "WHERE c.className = ? \n"
             ;
 
@@ -232,14 +241,7 @@ public class AttendeeDatasource {
                 new String[]{className});
         ArrayList<Student> students = new ArrayList<>();
         while (c.moveToNext()) {
-            students.add(new Student(
-                    this,
-                    __(c, "jagNumber"),
-                    __(c, "firstName"),
-                    __(c, "lastName"),
-                    __(c, "emailAddress"),
-                    __(c, "macAddress"))
-            );
+            students.add(Student.cursorToModel(this, c));
         }
         return students;
     }
@@ -251,13 +253,14 @@ public class AttendeeDatasource {
      * @param className
      * @return boolean
      */
-    public boolean studentInClass(String jagNumber, String className) {
-        Cursor c = db.rawQuery("SELECT * FROM tblEnrollment WHERE "
-                        + "jagNumber = ? and className = ?",
-                new String[]{jagNumber, className}
-        );
-        return c.moveToFirst();
-    }
+//    // TODO: Rethink this
+//    public boolean studentInClass(String jagNumber, String className) {
+//        Cursor c = db.rawQuery("SELECT * FROM tblEnrollment WHERE "
+//                        + "jagNumber = ? and className = ?",
+//                new String[]{jagNumber, className}
+//        );
+//        return c.moveToFirst();
+//    }
 
     // Begin existence checks
     // ======================

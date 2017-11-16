@@ -1,11 +1,12 @@
-package com.csc_331_jagwares.bluetoothattendee.persistence.model;
+package com.csc_331_jagwares.bluetoothattendee.persistence;
 
 import android.content.ContentValues;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteOpenHelper;
 
 import com.csc_331_jagwares.bluetoothattendee.persistence
         .AttendeeDatasource;
+import com.csc_331_jagwares.bluetoothattendee.persistence.Class;
+import com.csc_331_jagwares.bluetoothattendee.persistence.Model;
 
 /**
  * Created by steven on 10/3/2017.
@@ -51,12 +52,27 @@ public class Student extends Model {
 
     public ContentValues toContentValues() {
         ContentValues row = new ContentValues();
+        row.put("pk", pk);
         row.put("jagNumber", jagNumber);
         row.put("firstName", firstName);
         row.put("lastName", lastName);
         row.put("emailAddress", emailAddress);
         row.put("macAddress", macAddress);
         return row;
+    }
+
+
+    public static Student cursorToModel(AttendeeDatasource datasource, Cursor c) {
+        Student student = new Student(
+                datasource,
+                __(c, "jagNumber"),
+                __(c, "firstName"),
+                __(c, "lastName"),
+                __(c, "emailAddress"),
+                __(c, "macAddress")
+        );
+        student.setPk(Long.parseLong(__(c, "pk")));
+        return student;
     }
 
     /**

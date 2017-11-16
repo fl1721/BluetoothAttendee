@@ -3,7 +3,6 @@ package com.csc_331_jagwares.bluetoothattendee.fragments;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,8 +13,8 @@ import com.csc_331_jagwares.bluetoothattendee.R;
 import com.csc_331_jagwares.bluetoothattendee.activities.ClassActivity;
 import com.csc_331_jagwares.bluetoothattendee.adapters.StudentEntryAdapter;
 import com.csc_331_jagwares.bluetoothattendee.persistence.AttendeeDatasource;
-import com.csc_331_jagwares.bluetoothattendee.persistence.model.Class;
-import com.csc_331_jagwares.bluetoothattendee.persistence.model.Student;
+import com.csc_331_jagwares.bluetoothattendee.persistence.Class;
+import com.csc_331_jagwares.bluetoothattendee.persistence.Student;
 
 import java.util.ArrayList;
 

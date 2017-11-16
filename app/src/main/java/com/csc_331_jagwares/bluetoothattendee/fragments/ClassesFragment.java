@@ -16,7 +16,7 @@ import com.csc_331_jagwares.bluetoothattendee.activities.ClassActivity;
 import com.csc_331_jagwares.bluetoothattendee.activities.MainActivity;
 import com.csc_331_jagwares.bluetoothattendee.adapters.ClassEntryAdapter;
 import com.csc_331_jagwares.bluetoothattendee.persistence.AttendeeDatasource;
-import com.csc_331_jagwares.bluetoothattendee.persistence.model.Class;
+import com.csc_331_jagwares.bluetoothattendee.persistence.Class;
 
 import java.util.ArrayList;
 

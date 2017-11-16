@@ -1,7 +1,6 @@
 package com.csc_331_jagwares.bluetoothattendee.activities;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
@@ -25,10 +24,8 @@ import com.csc_331_jagwares.bluetoothattendee.fragments.HelpFragment;
 import com.csc_331_jagwares.bluetoothattendee.fragments.ReportsFragment;
 import com.csc_331_jagwares.bluetoothattendee.fragments.SettingsFragment;
 import com.csc_331_jagwares.bluetoothattendee.persistence.AttendeeDatasource;
-import com.csc_331_jagwares.bluetoothattendee.persistence.model.Class;
-import com.csc_331_jagwares.bluetoothattendee.persistence.model.Student;
-
-import java.io.File;
+import com.csc_331_jagwares.bluetoothattendee.persistence.Class;
+import com.csc_331_jagwares.bluetoothattendee.persistence.Student;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {

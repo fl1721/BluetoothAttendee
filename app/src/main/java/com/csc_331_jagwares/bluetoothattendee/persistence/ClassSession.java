@@ -1,11 +1,7 @@
-package com.csc_331_jagwares.bluetoothattendee.persistence.model;
+package com.csc_331_jagwares.bluetoothattendee.persistence;
 
 import android.content.ContentValues;
-import android.database.sqlite.SQLiteDatabase;
 import android.icu.text.SimpleDateFormat;
-
-import com.csc_331_jagwares.bluetoothattendee.persistence
-        .AttendeeDatasource;
 
 /**
  * Created by steven on 10/21/2017.

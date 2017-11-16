@@ -9,7 +9,7 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import com.csc_331_jagwares.bluetoothattendee.R;
-import com.csc_331_jagwares.bluetoothattendee.persistence.model.Student;
+import com.csc_331_jagwares.bluetoothattendee.persistence.Student;
 
 import java.util.ArrayList;
 
