@@ -24,7 +24,6 @@ public class ClassEntryAdapter extends ArrayAdapter {
         super(context, 0, classEntries);
     }
 
-
     @NonNull
     @Override
     public View getView(int position, View convertView, @NonNull ViewGroup parent) {
