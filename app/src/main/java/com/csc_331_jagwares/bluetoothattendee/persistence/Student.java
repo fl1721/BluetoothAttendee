@@ -1,11 +1,12 @@
-package com.csc_331_jagwares.bluetoothattendee.persistence.model;
+package com.csc_331_jagwares.bluetoothattendee.persistence;
 
 import android.content.ContentValues;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteOpenHelper;
 
 import com.csc_331_jagwares.bluetoothattendee.persistence
         .AttendeeDatasource;
+import com.csc_331_jagwares.bluetoothattendee.persistence.Class;
+import com.csc_331_jagwares.bluetoothattendee.persistence.Model;
 
 /**
  * Created by steven on 10/3/2017.
@@ -38,6 +39,7 @@ public class Student extends Model {
      * @param emailAddress
      * @param macAddress
      */
+
     public Student (AttendeeDatasource datasource, String jagNumber, String firstName, String lastName,
                     String emailAddress, String macAddress) {
         super(datasource);
@@ -50,12 +52,43 @@ public class Student extends Model {
 
     public ContentValues toContentValues() {
         ContentValues row = new ContentValues();
+        row.put("pk", pk);
         row.put("jagNumber", jagNumber);
         row.put("firstName", firstName);
         row.put("lastName", lastName);
         row.put("emailAddress", emailAddress);
         row.put("macAddress", macAddress);
         return row;
+    }
+
+
+    public static Student cursorToModel(AttendeeDatasource datasource, Cursor c) {
+        Student student = new Student(
+                datasource,
+                __(c, "jagNumber"),
+                __(c, "firstName"),
+                __(c, "lastName"),
+                __(c, "emailAddress"),
+                __(c, "macAddress")
+        );
+        student.setPk(Long.parseLong(__(c, "pk")));
+        return student;
+    }
+
+    /**
+     * Enroll student in a given class.
+     *
+     * @param cls
+     */
+    public void enroll(Class cls) {
+        datasource.enrollStudent(this, cls);
+    }
+    /**
+     * Save new objects, or save changes made by setter methods.
+     * Not needed after calling Student.enroll(Class).
+     */
+    public void save() {
+        datasource.insertStudent(this);
     }
 
     public String getJagNumber() {
@@ -92,16 +125,5 @@ public class Student extends Model {
 
     public void setMacAddress(String macAddress) {
         this.macAddress = macAddress;
-    }
-
-    public void enroll(Class cls) {
-        datasource.enrollStudent(this, cls);
-    }
-    /**
-     * Save new objects, or save changes made by setter methods.
-     * Not needed after calling Student.enroll(Class).
-     */
-    public void save() {
-        datasource.insertStudent(this);
     }
 }

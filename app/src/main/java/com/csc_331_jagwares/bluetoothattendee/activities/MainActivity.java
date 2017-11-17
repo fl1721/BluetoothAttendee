@@ -30,8 +30,8 @@ import com.csc_331_jagwares.bluetoothattendee.fragments.HelpFragment;
 import com.csc_331_jagwares.bluetoothattendee.fragments.ReportsFragment;
 import com.csc_331_jagwares.bluetoothattendee.fragments.SettingsFragment;
 import com.csc_331_jagwares.bluetoothattendee.persistence.AttendeeDatasource;
-import com.csc_331_jagwares.bluetoothattendee.persistence.model.Class;
-import com.csc_331_jagwares.bluetoothattendee.persistence.model.Student;
+import com.csc_331_jagwares.bluetoothattendee.persistence.Class;
+import com.csc_331_jagwares.bluetoothattendee.persistence.Student;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -99,8 +99,8 @@ public class MainActivity extends AppCompatActivity
         // Class.addStudent() and Student.enroll() are different
         // ways of doing the same thing.
         // You don't have to call save() after these.
-        if (!datasource.studentInClass(jimmy.getJagNumber(), ubw.getClassName())) { ubw.addStudent(jimmy);}
-        if (!datasource.studentInClass(willy.getJagNumber(), ubw.getClassName())) { willy.enroll(ubw);};
+        ubw.addStudent(jimmy);
+        willy.enroll(ubw);
 
         // Request permissions required for the app.
         if (ContextCompat.checkSelfPermission(this,

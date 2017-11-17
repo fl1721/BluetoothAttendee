@@ -1,6 +1,7 @@
-package com.csc_331_jagwares.bluetoothattendee.persistence.model;
+package com.csc_331_jagwares.bluetoothattendee.persistence;
 
 import android.content.ContentValues;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import com.csc_331_jagwares.bluetoothattendee.persistence
@@ -13,6 +14,19 @@ import com.csc_331_jagwares.bluetoothattendee.persistence
 abstract public class Model {
 
     AttendeeDatasource datasource;
+
+    protected long pk;
+
+    long getPk() {
+        return pk;
+    }
+    void setPk(long pk) {
+        this.pk = pk;
+    }
+    // Get value of field from cursor.
+    static String __(Cursor c, String fieldName) {
+        return c.getString(c.getColumnIndex(fieldName));
+    }
 
     public Model(AttendeeDatasource datasource) {
         this.datasource = datasource;
