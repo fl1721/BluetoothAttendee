@@ -41,14 +41,9 @@ public class AttendanceAdapter extends ArrayAdapter {
         if (studentEntry != null) {
             tvStudentName.setText(studentEntry.getFirstName() + " " + studentEntry.getLastName());
             tvStudentId.setText(studentEntry.getJagNumber());
-            if (studentEntry.getMacAddress() != null) {
-                view.setBackgroundResource(R.color.colorRegistered);
-                cbAttendance.setChecked(true);
+            view.setBackgroundResource(R.color.colorRegistered);
+            cbAttendance.setChecked(true);
             }
-            else{
-                cbAttendance.setChecked(false);
-            }
-        }
 
         return view;
     }

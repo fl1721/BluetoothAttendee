@@ -3,6 +3,7 @@ package com.csc_331_jagwares.bluetoothattendee.activities;
 import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.database.SQLException;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
@@ -57,7 +58,13 @@ public class MainActivity extends AppCompatActivity
         // Setup datasource.
         // TODO: Initialize database if it doesn't exist.
         datasource = AttendeeDatasource.getInstance(this);
-        datasource.open();
+        try {
+            datasource.open();
+            datasource.initializeDatabase();
+        }
+        catch (SQLException e){
+            datasource.open();
+        }
         //datasource.initializeDatabase();
 
         // Create classes.
