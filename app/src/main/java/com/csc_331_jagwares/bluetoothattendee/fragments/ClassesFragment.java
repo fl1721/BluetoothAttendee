@@ -16,7 +16,7 @@ import com.csc_331_jagwares.bluetoothattendee.activities.ClassActivity;
 import com.csc_331_jagwares.bluetoothattendee.activities.MainActivity;
 import com.csc_331_jagwares.bluetoothattendee.adapters.ClassEntryAdapter;
 import com.csc_331_jagwares.bluetoothattendee.persistence.AttendeeDatasource;
-import com.csc_331_jagwares.bluetoothattendee.persistence.model.Class;
+import com.csc_331_jagwares.bluetoothattendee.persistence.Class;
 
 import java.util.ArrayList;
 
@@ -29,6 +29,7 @@ public class ClassesFragment extends Fragment {
 
     private ArrayList<Class> classes;
 
+    private ClassEntryAdapter adapter;
 
     public ClassesFragment() {
         // Required empty public constructor.
@@ -62,11 +63,16 @@ public class ClassesFragment extends Fragment {
 
     private void populateListView(View view, ArrayList<Class> classes) {
         // Create the adapter to convert the array to views
-        ClassEntryAdapter adapter = new ClassEntryAdapter(getContext(), classes);
+        adapter = new ClassEntryAdapter(getContext(), classes);
 
         // Attach the adapter to a ListView
         ListView lvClassList = view.findViewById(R.id.lvClassList);
         lvClassList.setAdapter(adapter);
+    }
+
+    public void updateListView(Class classEntry) {
+        classes.add(classEntry);
+        adapter.notifyDataSetChanged();
     }
 
     private void registerClickCallback(View view) {

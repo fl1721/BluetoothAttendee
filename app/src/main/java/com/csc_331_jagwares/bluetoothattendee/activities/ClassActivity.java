@@ -10,7 +10,7 @@ import android.util.Log;
 import com.csc_331_jagwares.bluetoothattendee.R;
 import com.csc_331_jagwares.bluetoothattendee.fragments.ClassFragment;
 import com.csc_331_jagwares.bluetoothattendee.persistence.AttendeeDatasource;
-import com.csc_331_jagwares.bluetoothattendee.persistence.model.Class;
+import com.csc_331_jagwares.bluetoothattendee.persistence.Class;
 
 public class ClassActivity extends AppCompatActivity {
 

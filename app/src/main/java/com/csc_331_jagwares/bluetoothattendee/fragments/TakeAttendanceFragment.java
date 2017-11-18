@@ -23,8 +23,8 @@ import com.csc_331_jagwares.bluetoothattendee.activities.ClassActivity;
 import com.csc_331_jagwares.bluetoothattendee.adapters.AttendanceAdapter;
 import com.csc_331_jagwares.bluetoothattendee.adapters.StudentEntryAdapter;
 import com.csc_331_jagwares.bluetoothattendee.persistence.AttendeeDatasource;
-import com.csc_331_jagwares.bluetoothattendee.persistence.model.Class;
-import com.csc_331_jagwares.bluetoothattendee.persistence.model.Student;
+import com.csc_331_jagwares.bluetoothattendee.persistence.Class;
+import com.csc_331_jagwares.bluetoothattendee.persistence.Student;
 
 import java.util.ArrayList;
 
@@ -79,6 +79,20 @@ public class TakeAttendanceFragment extends Fragment {
 
         // Get BluetoothAdapter from the ClassActivity.
         mBluetoothAdapter = ((ClassActivity) getActivity()).getBTAdapter();
+
+        final CheckBox cbAttend = view.findViewById(R.id.cbAttend);
+        cbAttend.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                // TODO Auto-generated method stub
+                if(cbAttend.isChecked()){
+                    Log.d("BT", "checked.");
+                }else{
+                    Log.d("BT", "unchecked.");
+                }
+            }
+        });
 
         // Setup register devices button.
         final Button takeAttendanceBtn = view.findViewById(R.id.takeAttendanceBtn);
@@ -145,7 +159,8 @@ public class TakeAttendanceFragment extends Fragment {
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                // Student studentEntry = students.get(position);
+                Student studentEntry = students.get(position);
+
             }
         });
     }
@@ -154,6 +169,7 @@ public class TakeAttendanceFragment extends Fragment {
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
+            CheckBox cbAttendance = view.findViewById(R.id.cbAttend);
             if (BluetoothDevice.ACTION_FOUND.equals(action)) {
                 // Discovery has found a device. Get the BluetoothDevice
                 // object and its info from the Intent.
@@ -163,8 +179,9 @@ public class TakeAttendanceFragment extends Fragment {
                     Log.d("BT", "Added " + device.getName() + ":" + device.getAddress());
                     mBluetoothAdapter.cancelDiscovery();
                     for (Student student : students) {
-                        if (student.getJagNumber().equals(device.getName())) {
-                            student.setMacAddress(device.getAddress());
+                        if (student.getMacAddress().equals(device.getName())) {
+                            view.setBackgroundResource(R.color.colorRegistered);
+                            cbAttendance.setChecked(true);
                             updateListView(student);
                             Log.d("BT", student.getJagNumber() + " added with mac " + student.getMacAddress());
                         }

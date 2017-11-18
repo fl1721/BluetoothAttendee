@@ -10,7 +10,7 @@ import android.widget.CheckBox;
 import android.widget.TextView;
 
 import com.csc_331_jagwares.bluetoothattendee.R;
-import com.csc_331_jagwares.bluetoothattendee.persistence.model.Student;
+import com.csc_331_jagwares.bluetoothattendee.persistence.Student;
 
 import java.util.ArrayList;
 
@@ -41,8 +41,6 @@ public class AttendanceAdapter extends ArrayAdapter {
         if (studentEntry != null) {
             tvStudentName.setText(studentEntry.getFirstName() + " " + studentEntry.getLastName());
             tvStudentId.setText(studentEntry.getJagNumber());
-            view.setBackgroundResource(R.color.colorRegistered);
-            cbAttendance.setChecked(true);
             }
 
         return view;

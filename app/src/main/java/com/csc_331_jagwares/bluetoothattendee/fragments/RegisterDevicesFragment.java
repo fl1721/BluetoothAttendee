@@ -21,8 +21,8 @@ import com.csc_331_jagwares.bluetoothattendee.R;
 import com.csc_331_jagwares.bluetoothattendee.activities.ClassActivity;
 import com.csc_331_jagwares.bluetoothattendee.adapters.StudentEntryAdapter;
 import com.csc_331_jagwares.bluetoothattendee.persistence.AttendeeDatasource;
-import com.csc_331_jagwares.bluetoothattendee.persistence.model.Class;
-import com.csc_331_jagwares.bluetoothattendee.persistence.model.Student;
+import com.csc_331_jagwares.bluetoothattendee.persistence.Class;
+import com.csc_331_jagwares.bluetoothattendee.persistence.Student;
 
 import java.util.ArrayList;
 
@@ -144,7 +144,10 @@ public class RegisterDevicesFragment extends Fragment {
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                // Student studentEntry = students.get(position);
+                Student studentEntry = students.get(position);
+                studentEntry.setMacAddress("HELLO I'M A MAC ADDRESS");
+                studentEntry.save();
+                updateListView(studentEntry);
             }
         });
     }
@@ -164,6 +167,7 @@ public class RegisterDevicesFragment extends Fragment {
                     for (Student student : students) {
                         if (student.getJagNumber().equals(device.getName())) {
                             student.setMacAddress(device.getAddress());
+                            student.save();
                             updateListView(student);
                             Log.d("BT", student.getJagNumber() + " added with mac " + student.getMacAddress());
                         }
